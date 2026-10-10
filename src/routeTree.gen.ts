@@ -10,33 +10,103 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BuscarRouteImport } from './routes/buscar'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as MiQrRouteImport } from './routes/mi-qr'
+import { Route as PanelRouteImport } from './routes/panel'
+import { Route as CafeteriaIdRouteImport } from './routes/cafeteria.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuscarRoute = BuscarRouteImport.update({
+  id: '/buscar',
+  path: '/buscar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MiQrRoute = MiQrRouteImport.update({
+  id: '/mi-qr',
+  path: '/mi-qr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanelRoute = PanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CafeteriaIdRoute = CafeteriaIdRouteImport.update({
+  id: '/cafeteria/$id',
+  path: '/cafeteria/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
+  '/chat': typeof ChatRoute
+  '/mi-qr': typeof MiQrRoute
+  '/panel': typeof PanelRoute
+  '/cafeteria/$id': typeof CafeteriaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
+  '/chat': typeof ChatRoute
+  '/mi-qr': typeof MiQrRoute
+  '/panel': typeof PanelRoute
+  '/cafeteria/$id': typeof CafeteriaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
+  '/chat': typeof ChatRoute
+  '/mi-qr': typeof MiQrRoute
+  '/panel': typeof PanelRoute
+  '/cafeteria/$id': typeof CafeteriaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/buscar' | '/chat' | '/mi-qr' | '/panel' | '/cafeteria/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    '/' | '/auth' | '/buscar' | '/chat' | '/mi-qr' | '/panel' | '/cafeteria/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/buscar'
+    | '/chat'
+    | '/mi-qr'
+    | '/panel'
+    | '/cafeteria/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  BuscarRoute: typeof BuscarRoute
+  ChatRoute: typeof ChatRoute
+  MiQrRoute: typeof MiQrRoute
+  PanelRoute: typeof PanelRoute
+  CafeteriaIdRoute: typeof CafeteriaIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +118,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buscar': {
+      id: '/buscar'
+      path: '/buscar'
+      fullPath: '/buscar'
+      preLoaderRoute: typeof BuscarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mi-qr': {
+      id: '/mi-qr'
+      path: '/mi-qr'
+      fullPath: '/mi-qr'
+      preLoaderRoute: typeof MiQrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panel': {
+      id: '/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof PanelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cafeteria/$id': {
+      id: '/cafeteria/$id'
+      path: '/cafeteria/$id'
+      fullPath: '/cafeteria/$id'
+      preLoaderRoute: typeof CafeteriaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  BuscarRoute: BuscarRoute,
+  ChatRoute: ChatRoute,
+  MiQrRoute: MiQrRoute,
+  PanelRoute: PanelRoute,
+  CafeteriaIdRoute: CafeteriaIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
