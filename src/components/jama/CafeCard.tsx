@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Plug, Star, Volume1, Volume2, VolumeX, Wifi } from "lucide-react";
+import { Plug, Star, Volume1, Volume2, VolumeX, Wifi, Heart } from "lucide-react";
 import type { Cafe, Noise } from "@/data/cafes";
+import { useFavorites } from "@/lib/useFavorites";
 
 export const NoiseIcon = ({ noise, className = "h-3.5 w-3.5" }: { noise: Noise; className?: string }) =>
   noise === "Silencioso" ? <VolumeX className={className} /> : noise === "Moderado" ? <Volume1 className={className} /> : <Volume2 className={className} />;
@@ -12,6 +13,9 @@ export const Chip = ({ children }: { children: React.ReactNode }) => (
 const occColor = { bajo: "bg-success", medio: "bg-warning", alto: "bg-destructive" };
 
 export function CafeCard({ cafe, compact = false }: { cafe: Cafe; compact?: boolean }) {
+  const { favorites, toggleFavorite } = useFavorites();
+  const isFav = favorites.includes(cafe.id);
+
   return (
     <Link to="/cafeteria/$id" params={{ id: cafe.id }}
       className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-card transition hover:-translate-y-0.5 hover:border-primary/40">
@@ -22,6 +26,11 @@ export function CafeCard({ cafe, compact = false }: { cafe: Cafe; compact?: bool
             -{cafe.discount.percent}% Jama
           </span>
         )}
+        <button 
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite.mutate(cafe.id); }} 
+          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-background/80 backdrop-blur-md transition hover:scale-110">
+          <Heart className={`h-4 w-4 ${isFav ? "fill-destructive text-destructive" : "text-foreground"}`} />
+        </button>
       </div>
       <div className="space-y-3 p-4">
         <div className="flex items-start justify-between gap-2">

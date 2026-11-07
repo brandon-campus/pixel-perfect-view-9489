@@ -10,16 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BuscarRouteImport } from './routes/buscar'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as FavoritosRouteImport } from './routes/favoritos'
 import { Route as MiQrRouteImport } from './routes/mi-qr'
 import { Route as PanelRouteImport } from './routes/panel'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminComisionesRouteImport } from './routes/admin.comisiones'
+import { Route as AdminCuponesRouteImport } from './routes/admin.cupones'
+import { Route as AdminLugaresRouteImport } from './routes/admin.lugares'
+import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as CafeteriaIdRouteImport } from './routes/cafeteria.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -37,6 +49,11 @@ const ChatRoute = ChatRouteImport.update({
   path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FavoritosRoute = FavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MiQrRoute = MiQrRouteImport.update({
   id: '/mi-qr',
   path: '/mi-qr',
@@ -47,6 +64,31 @@ const PanelRoute = PanelRouteImport.update({
   path: '/panel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminComisionesRoute = AdminComisionesRouteImport.update({
+  id: '/comisiones',
+  path: '/comisiones',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCuponesRoute = AdminCuponesRouteImport.update({
+  id: '/cupones',
+  path: '/cupones',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLugaresRoute = AdminLugaresRouteImport.update({
+  id: '/lugares',
+  path: '/lugares',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CafeteriaIdRoute = CafeteriaIdRouteImport.update({
   id: '/cafeteria/$id',
   path: '/cafeteria/$id',
@@ -55,55 +97,109 @@ const CafeteriaIdRoute = CafeteriaIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/buscar': typeof BuscarRoute
   '/chat': typeof ChatRoute
+  '/favoritos': typeof FavoritosRoute
   '/mi-qr': typeof MiQrRoute
   '/panel': typeof PanelRoute
+  '/admin/comisiones': typeof AdminComisionesRoute
+  '/admin/cupones': typeof AdminCuponesRoute
+  '/admin/lugares': typeof AdminLugaresRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/cafeteria/$id': typeof CafeteriaIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/buscar': typeof BuscarRoute
   '/chat': typeof ChatRoute
+  '/favoritos': typeof FavoritosRoute
   '/mi-qr': typeof MiQrRoute
   '/panel': typeof PanelRoute
+  '/admin/comisiones': typeof AdminComisionesRoute
+  '/admin/cupones': typeof AdminCuponesRoute
+  '/admin/lugares': typeof AdminLugaresRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/cafeteria/$id': typeof CafeteriaIdRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/buscar': typeof BuscarRoute
   '/chat': typeof ChatRoute
+  '/favoritos': typeof FavoritosRoute
   '/mi-qr': typeof MiQrRoute
   '/panel': typeof PanelRoute
+  '/admin/comisiones': typeof AdminComisionesRoute
+  '/admin/cupones': typeof AdminCuponesRoute
+  '/admin/lugares': typeof AdminLugaresRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
   '/cafeteria/$id': typeof CafeteriaIdRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/buscar' | '/chat' | '/mi-qr' | '/panel' | '/cafeteria/$id'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/buscar'
+    | '/chat'
+    | '/favoritos'
+    | '/mi-qr'
+    | '/panel'
+    | '/admin/comisiones'
+    | '/admin/cupones'
+    | '/admin/lugares'
+    | '/admin/usuarios'
+    | '/cafeteria/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/buscar' | '/chat' | '/mi-qr' | '/panel' | '/cafeteria/$id'
-  id:
-    | '__root__'
     | '/'
     | '/auth'
     | '/buscar'
     | '/chat'
+    | '/favoritos'
     | '/mi-qr'
     | '/panel'
+    | '/admin/comisiones'
+    | '/admin/cupones'
+    | '/admin/lugares'
+    | '/admin/usuarios'
     | '/cafeteria/$id'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/buscar'
+    | '/chat'
+    | '/favoritos'
+    | '/mi-qr'
+    | '/panel'
+    | '/admin/comisiones'
+    | '/admin/cupones'
+    | '/admin/lugares'
+    | '/admin/usuarios'
+    | '/cafeteria/$id'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   BuscarRoute: typeof BuscarRoute
   ChatRoute: typeof ChatRoute
+  FavoritosRoute: typeof FavoritosRoute
   MiQrRoute: typeof MiQrRoute
   PanelRoute: typeof PanelRoute
   CafeteriaIdRoute: typeof CafeteriaIdRoute
@@ -116,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -139,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/favoritos': {
+      id: '/favoritos'
+      path: '/favoritos'
+      fullPath: '/favoritos'
+      preLoaderRoute: typeof FavoritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mi-qr': {
       id: '/mi-qr'
       path: '/mi-qr'
@@ -153,6 +263,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PanelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/comisiones': {
+      id: '/admin/comisiones'
+      path: '/comisiones'
+      fullPath: '/admin/comisiones'
+      preLoaderRoute: typeof AdminComisionesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cupones': {
+      id: '/admin/cupones'
+      path: '/cupones'
+      fullPath: '/admin/cupones'
+      preLoaderRoute: typeof AdminCuponesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/lugares': {
+      id: '/admin/lugares'
+      path: '/lugares'
+      fullPath: '/admin/lugares'
+      preLoaderRoute: typeof AdminLugaresRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/cafeteria/$id': {
       id: '/cafeteria/$id'
       path: '/cafeteria/$id'
@@ -163,11 +308,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminComisionesRoute: typeof AdminComisionesRoute
+  AdminCuponesRoute: typeof AdminCuponesRoute
+  AdminLugaresRoute: typeof AdminLugaresRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminComisionesRoute: AdminComisionesRoute,
+  AdminCuponesRoute: AdminCuponesRoute,
+  AdminLugaresRoute: AdminLugaresRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   BuscarRoute: BuscarRoute,
   ChatRoute: ChatRoute,
+  FavoritosRoute: FavoritosRoute,
   MiQrRoute: MiQrRoute,
   PanelRoute: PanelRoute,
   CafeteriaIdRoute: CafeteriaIdRoute,

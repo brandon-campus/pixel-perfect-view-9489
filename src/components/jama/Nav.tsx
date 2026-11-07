@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Coffee, Home, MessageCircle, QrCode, Search, User } from "lucide-react";
+import { Coffee, Home, Heart, QrCode, Search, User } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export function Logo() {
@@ -14,7 +14,7 @@ export function Logo() {
 }
 
 export function TopNav() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const cls = "text-sm text-muted-foreground transition-colors hover:text-foreground";
   const active = { className: "text-foreground font-semibold" };
   return (
@@ -23,9 +23,14 @@ export function TopNav() {
         <Logo />
         <nav className="hidden items-center gap-7 md:flex">
           <Link to="/buscar" className={cls} activeProps={active}>Buscar</Link>
-          <Link to="/chat" className={cls} activeProps={active}>Chat IA</Link>
+          <Link to="/favoritos" className={cls} activeProps={active}>Favoritos</Link>
           <Link to="/mi-qr" className={cls} activeProps={active}>Mi QR</Link>
           <Link to="/panel" className={cls} activeProps={active}>Panel</Link>
+          {isAdmin && (
+            <Link to="/admin" className="text-sm font-semibold text-amber-500 hover:text-amber-400 transition-colors" activeProps={{ className: "text-amber-400 font-bold underline" }}>
+              Admin
+            </Link>
+          )}
           <Link to="/auth" className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
             {user ? user.name.split(" ")[0] : "Ingresar"}
           </Link>
@@ -39,7 +44,7 @@ export function BottomNav() {
   const items = [
     { to: "/", icon: Home, label: "Inicio" },
     { to: "/buscar", icon: Search, label: "Buscar" },
-    { to: "/chat", icon: MessageCircle, label: "Chat" },
+    { to: "/favoritos", icon: Heart, label: "Favoritos" },
     { to: "/mi-qr", icon: QrCode, label: "QR" },
     { to: "/auth", icon: User, label: "Perfil" },
   ] as const;
@@ -69,7 +74,7 @@ export function Footer() {
         </div>
         <div className="flex gap-6 text-sm text-muted-foreground">
           <Link to="/buscar" className="hover:text-foreground">Buscar</Link>
-          <Link to="/chat" className="hover:text-foreground">Chat IA</Link>
+          <Link to="/favoritos" className="hover:text-foreground">Favoritos</Link>
           <Link to="/panel" className="hover:text-foreground">Para cafeterías</Link>
         </div>
         <p className="text-xs text-muted-foreground">© 2026 Jama · CABA</p>

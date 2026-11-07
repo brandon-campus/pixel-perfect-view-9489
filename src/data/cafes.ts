@@ -34,7 +34,7 @@ const P = [
   u("photo-1525610553991-2bede1a236e2"),
   u("photo-1511920170033-f8396924c348"),
 ];
-const photos = (i: number) => [P[i % 10], P[(i + 3) % 10], P[(i + 6) % 10], P[(i + 8) % 10]];
+const photos = (i: number): string[] => [P[i % 10]!, P[(i + 3) % 10]!, P[(i + 6) % 10]!, P[(i + 8) % 10]!];
 
 const hours = (open = "08:00", close = "20:00") => [
   { day: "Lunes a Viernes", time: `${open} – ${close}` },

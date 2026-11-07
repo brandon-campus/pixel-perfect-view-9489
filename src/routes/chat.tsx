@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Coffee, SendHorizontal } from "lucide-react";
-import { cafes, barrios, type Cafe } from "@/data/cafes";
+import { type Cafe } from "@/data/cafes";
+import { useAuth } from "@/lib/auth";
 import { CafeCard } from "@/components/jama/CafeCard";
 
 export const Route = createFileRoute("/chat")({
@@ -18,23 +19,72 @@ export const Route = createFileRoute("/chat")({
 
 interface Msg { role: "user" | "agent"; text: string; cafes?: Cafe[] }
 
-function recommend(q: string): Msg {
-  const t = q.toLowerCase();
-  let list = [...cafes];
-  const barrio = barrios.find((b) => t.includes(b.toLowerCase()));
-  if (barrio) list = list.filter((c) => c.barrio === barrio);
-  if (/tranquil|silenc|concentr/.test(t)) list = list.filter((c) => c.noise === "Silencioso");
-  if (/wifi|rápid|rapid|internet|llamad|zoom/.test(t)) list.sort((a, b) => b.wifi - a.wifi);
-  if (/enchuf|cargar|bater/.test(t)) list = list.filter((c) => c.plugs > 0);
-  if (/barat|económ|econom/.test(t)) list = list.filter((c) => c.price !== "$$$");
-  if (/descuent|promo/.test(t)) list = list.filter((c) => c.discount);
-  if (!list.length) list = [...cafes].sort((a, b) => b.rating - a.rating);
-  const top = list.slice(0, 3);
-  return {
-    role: "agent",
-    text: `${barrio ? `En ${barrio}` : "Para vos"} encontré ${top.length} ${top.length === 1 ? "opción" : "opciones"} que encajan. ${top[0].name} es mi favorita: ${top[0].wifi} Mbps y ambiente ${top[0].noise.toLowerCase()}.`,
-    cafes: top,
-  };
+const WEBHOOK_URL: string | undefined = import.meta.env["VITE_N8N_WEBHOOK_URL"];
+
+const ERROR_MSG = "Uy, no pude conectarme con Jama en este momento. Probá de nuevo en unos segundos.";
+
+function getSessionId(): string {
+  try {
+    const saved = sessionStorage.getItem("jama-chat-session");
+    if (saved) return saved;
+    const id = crypto.randomUUID();
+    sessionStorage.setItem("jama-chat-session", id);
+    return id;
+  } catch {
+    return crypto.randomUUID();
+  }
+}
+
+// El workflow de n8n responde { "output": "..." } (o un array con ese objeto).
+function extractOutput(raw: string): string {
+  let data: unknown;
+  try { data = JSON.parse(raw); } catch { return ""; }
+  if (Array.isArray(data)) data = data[0];
+  const output = (data as { output?: unknown } | null)?.output;
+  return typeof output === "string" ? output.trim() : "";
+}
+
+async function askAgent(
+  message: string,
+  sessionId: string,
+  user: { id: string; name: string; email: string } | null,
+): Promise<Msg> {
+  if (!WEBHOOK_URL) {
+    console.error("[chat] Falta la variable de entorno VITE_N8N_WEBHOOK_URL");
+    return { role: "agent", text: ERROR_MSG };
+  }
+
+  let res: Response;
+  let raw: string;
+  try {
+    res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        sessionId,
+        userId: user?.id ?? null,
+        userName: user?.name ?? null,
+        userEmail: user?.email ?? null,
+      }),
+    });
+    raw = await res.text();
+  } catch (err) {
+    console.error("[chat] Error de red llamando al webhook de n8n:", err);
+    return { role: "agent", text: ERROR_MSG };
+  }
+
+  if (!res.ok) {
+    console.error(`[chat] El webhook de n8n respondió ${res.status} ${res.statusText}:`, raw);
+    return { role: "agent", text: ERROR_MSG };
+  }
+
+  const output = extractOutput(raw);
+  if (!output) {
+    console.error("[chat] El webhook de n8n respondió 200 pero sin campo `output`:", raw);
+    return { role: "agent", text: ERROR_MSG };
+  }
+  return { role: "agent", text: output };
 }
 
 const suggestions = ["Lugar tranquilo en Palermo", "WiFi rápido para llamadas", "Algo barato con enchufes", "Con descuento Jama"];
@@ -45,16 +95,21 @@ function ChatPage() {
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const { user } = useAuth();
+  const sessionId = useRef(getSessionId());
   const end = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { end.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, typing]);
 
-  const send = (text: string) => {
+  const send = async (text: string) => {
     if (!text.trim() || typing) return;
     setMsgs((m) => [...m, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    setTimeout(() => { setMsgs((m) => [...m, recommend(text)]); setTyping(false); inputRef.current?.focus(); }, 900);
+    const reply = await askAgent(text.trim(), sessionId.current, user);
+    setMsgs((m) => [...m, reply]);
+    setTyping(false);
+    inputRef.current?.focus();
   };
 
   return (

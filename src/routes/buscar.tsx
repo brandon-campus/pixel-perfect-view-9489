@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { cafes, barrios, type Noise, type Price } from "@/data/cafes";
+import { barrios, type Noise, type Price, type Cafe } from "@/data/cafes";
 import { CafeCard } from "@/components/jama/CafeCard";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/buscar")({
   head: () => ({
@@ -38,6 +39,37 @@ function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; labe
 function Buscar() {
   const [f, setF] = useState(empty);
   const [open, setOpen] = useState(false);
+  const [cafes, setCafes] = useState<Cafe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCafes() {
+      const { data, error } = await supabase.from('lugares').select('*');
+      if (data && !error) {
+        const mapped: Cafe[] = data.map(d => ({
+          id: d.id,
+          name: d.nombre,
+          barrio: d.barrio,
+          address: d.direccion,
+          wifi: (d.wifi_score ?? 5) * 10,
+          noise: (d.nivel_ruido || "Moderado") as Noise,
+          price: (d.rango_precios || "$$") as Price,
+          plugs: d.tiene_enchufes ? 10 : 0,
+          rating: 4.5,
+          occupancy: "medio",
+          openNow: true,
+          photos: d.fotos || [],
+          hours: JSON.parse(d.horarios || "[]"),
+          menu: JSON.parse(d.productos_destacados || "[]"),
+          occupancyByTime: [],
+        }));
+        setCafes(mapped);
+      }
+      setLoading(false);
+    }
+    fetchCafes();
+  }, []);
+
   const results = useMemo(() => cafes.filter((c) => {
     if (f.barrio && c.barrio !== f.barrio) return false;
     if (f.noise.length && !f.noise.includes(c.noise)) return false;
@@ -49,7 +81,7 @@ function Buscar() {
       if (!f.speed.includes(s)) return false;
     }
     return true;
-  }), [f]);
+  }), [f, cafes]);
 
   const filters = (
     <div className="space-y-6">
@@ -92,8 +124,13 @@ function Buscar() {
       <div className="mt-6 grid gap-8 md:grid-cols-[260px_1fr]">
         <aside className="hidden h-fit rounded-2xl border border-border bg-card p-5 md:sticky md:top-24 md:block">{filters}</aside>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map((c) => <CafeCard key={c.id} cafe={c} />)}
-          {!results.length && <p className="col-span-full rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">No hay cafeterías con esos filtros. Probá limpiarlos.</p>}
+          {loading ? (
+            <p className="col-span-full py-10 text-center text-muted-foreground">Cargando lugares...</p>
+          ) : results.length > 0 ? (
+            results.map((c) => <CafeCard key={c.id} cafe={c} />)
+          ) : (
+            <p className="col-span-full rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">No hay cafeterías con esos filtros. Probá limpiarlos.</p>
+          )}
         </div>
       </div>
       {open && (

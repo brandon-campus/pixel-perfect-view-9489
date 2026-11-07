@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircle, MapPin, QrCode, Search, Sparkles as _s, Wifi } from "lucide-react";
-import { cafes } from "@/data/cafes";
+import { useEffect, useState } from "react";
 import { CafeCard } from "@/components/jama/CafeCard";
 import { Footer } from "@/components/jama/Nav";
+import { supabase } from "@/lib/supabase";
+import type { Cafe } from "@/data/cafes";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +28,37 @@ const steps = [
 ];
 
 function Index() {
+  const [featuredCafes, setFeaturedCafes] = useState<Cafe[]>([]);
+
+  useEffect(() => {
+    async function fetchDestacadas() {
+      const { data, error } = await supabase.from('lugares').select('*').limit(3);
+      if (data && !error) {
+        // Mapeamos temporalmente la BD al formato del componente
+        const mapped: Cafe[] = data.map(d => ({
+          id: d.id,
+          name: d.nombre,
+          barrio: d.barrio,
+          address: d.direccion,
+          wifi: (d.wifi_score ?? 5) * 10, // El mock usa 0-100, la db 1-10
+          noise: (d.nivel_ruido || "Moderado") as any,
+          price: (d.rango_precios || "$$") as any,
+          plugs: d.tiene_enchufes ? 10 : 0,
+          rating: 4.8, // Mockeado hasta v2
+          occupancy: "medio",
+          openNow: true,
+          photos: d.fotos || [],
+          hours: JSON.parse(d.horarios || "[]"),
+          menu: JSON.parse(d.productos_destacados || "[]"),
+          occupancyByTime: [],
+          discount: { percent: 15, description: "Descuento Jama" } // Mock
+        }));
+        setFeaturedCafes(mapped);
+      }
+    }
+    fetchDestacadas();
+  }, []);
+
   return (
     <>
       <section className="relative overflow-hidden bg-hero">
@@ -83,7 +116,7 @@ function Index() {
           <Link to="/buscar" className="text-sm font-semibold text-primary">Ver todas →</Link>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cafes.filter((c) => c.discount).slice(0, 3).map((c) => <CafeCard key={c.id} cafe={c} />)}
+          {featuredCafes.map((c) => <CafeCard key={c.id} cafe={c} />)}
         </div>
       </section>
       <Footer />
